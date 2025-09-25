@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
   <title>To-Do App</title>
@@ -25,6 +25,171 @@
     async function addTask() {
       let task = document.getElementById("taskInput").value;
       await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task }) });
+      fetchTasks();
+    }
+
+    async function toggleTask(id) {
+      await fetch(API + "/" + id, { method: "PUT" });
+      fetchTasks();
+    }
+
+    async function deleteTask(id) {
+      await fetch(API + "/" + id, { method: "DELETE" });
+      fetchTasks();
+    }
+
+    fetchTasks();
+  </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do App</title>
+  <style>
+    /* General page styling */
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #6dd5ed, #2193b0);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Container box */
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      width: 400px;
+      text-align: center;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    /* Input and button */
+    #taskInput {
+      padding: 10px;
+      width: 65%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      transition: border 0.3s;
+    }
+    #taskInput:focus {
+      border-color: #2193b0;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin-left: 5px;
+      border: none;
+      border-radius: 8px;
+      background: #2193b0;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #176d85;
+    }
+
+    /* Task list styling */
+    #taskList {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+      text-align: left;
+    }
+    #taskList li {
+      background: #f9f9f9;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    #taskList li:hover {
+      transform: scale(1.02);
+    }
+
+    /* Completed vs Pending task */
+    .completed {
+      text-decoration: line-through;
+      color: gray;
+    }
+
+    /* Buttons inside list */
+    .task-actions button {
+      margin-left: 5px;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      border-radius: 6px;
+    }
+    .task-actions .delete-btn {
+      background: #e74c3c;
+    }
+    .task-actions .delete-btn:hover {
+      background: #c0392b;
+    }
+    .task-actions .toggle-btn {
+      background: #2ecc71;
+    }
+    .task-actions .toggle-btn:hover {
+      background: #27ae60;
+    }
+
+    /* Fade in animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>My To-Do List</h2>
+    <input id="taskInput" placeholder="Enter task">
+    <button onclick="addTask()">Add</button>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    const API = "/api/tasks";
+
+    async function fetchTasks() {
+      let res = await fetch(API);
+      let tasks = await res.json();
+      document.getElementById("taskList").innerHTML = tasks.map(
+        t => `<li>
+                <span class="${t.completed ? "completed" : ""}">${t.task}</span>
+                <div class="task-actions">
+                  <button class="toggle-btn" onclick="toggleTask('${t._id}')">${t.completed ? "Undo" : "Done"}</button>
+                  <button class="delete-btn" onclick="deleteTask('${t._id}')">Delete</button>
+                </div>
+              </li>`
+      ).join("");
+    }
+
+    async function addTask() {
+      let task = document.getElementById("taskInput").value;
+      if (!task.trim()) return;
+      await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task }) });
+      document.getElementById("taskInput").value = "";
       fetchTasks();
     }
 
