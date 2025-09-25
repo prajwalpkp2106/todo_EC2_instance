@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>To-Do App</title>
+</head>
+<body>
+  <h2>My To-Do List</h2>
+  <input id="taskInput" placeholder="Enter task">
+  <button onclick="addTask()">Add</button>
+  <ul id="taskList"></ul>
+
+  <script>
+    const API = "http://Localhost:3000/tasks";
+
+    async function fetchTasks() {
+      let res = await fetch(API);
+      let tasks = await res.json();
+      document.getElementById("taskList").innerHTML = tasks.map(
+        t => `<li>${t.task} - ${t.completed ? "✅" : "❌"}
+        <button onclick="toggleTask('${t._id}')">Toggle</button>
+        <button onclick="deleteTask('${t._id}')">Delete</button></li>`
+      ).join("");
+    }
+
+    async function addTask() {
+      let task = document.getElementById("taskInput").value;
+      await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task }) });
+      fetchTasks();
+    }
+
+    async function toggleTask(id) {
+      await fetch(API + "/" + id, { method: "PUT" });
+      fetchTasks();
+    }
+
+    async function deleteTask(id) {
+      await fetch(API + "/" + id, { method: "DELETE" });
+      fetchTasks();
+    }
+
+    fetchTasks();
+  </script>
+</body>
+</html>
